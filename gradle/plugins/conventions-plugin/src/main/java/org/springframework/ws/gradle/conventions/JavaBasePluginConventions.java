@@ -35,6 +35,12 @@ class JavaBasePluginConventions {
 
 	static final String SHIBBOLETH_RELEASES_REPOSITORY_NAME = "Shibboleth Releases";
 
+	static final String RELEASE_TRAIN_MAVEN_REPOSITORY_URL = "RELEASE_TRAIN_MAVEN_REPOSITORY_URL";
+
+	static final String RELEASE_TRAIN_MAVEN_REPOSITORY_USERNAME = "RELEASE_TRAIN_MAVEN_REPOSITORY_USERNAME";
+
+	static final String RELEASE_TRAIN_MAVEN_REPOSITORY_PASSWORD = "RELEASE_TRAIN_MAVEN_REPOSITORY_PASSWORD";
+
 	void apply(Project project) {
 		configureRepositories(project);
 		project.getTasks().withType(Javadoc.class).configureEach((javadoc) -> {
@@ -57,6 +63,17 @@ class JavaBasePluginConventions {
 				content.includeGroup("net.shibboleth");
 			});
 		});
+		if (System.getenv(RELEASE_TRAIN_MAVEN_REPOSITORY_URL) != null) {
+			project.getRepositories().maven((repository) -> {
+				repository.setName("Release Train");
+				repository.setUrl(System.getenv(RELEASE_TRAIN_MAVEN_REPOSITORY_URL));
+				repository.credentials((credentials) -> {
+					credentials.setUsername(System.getenv(RELEASE_TRAIN_MAVEN_REPOSITORY_USERNAME));
+					credentials.setPassword(System.getenv(RELEASE_TRAIN_MAVEN_REPOSITORY_PASSWORD));
+				});
+			});
+		}
+
 		String version = project.getVersion().toString();
 		if (version.contains("-")) {
 			project.getRepositories().maven((repository) -> {
